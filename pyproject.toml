@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.116.1",
+    "myapplication>=0.1.0",
+    "python-dotenv>=1.1.1",
+    "tomlkit>=0.13.3",
     "uvicorn>=0.35.0",
 ]
 
@@ -13,9 +16,11 @@ dependencies = [
 dev = [
     "aerich>=0.9.1",
     "asyncpg>=0.30.0",
+    "fastapi[standard]>=0.116.1",
     "httpx>=0.28.1",
     "pytest>=8.4.2",
     "ruff>=0.12.12",
+    "tomli-w>=1.2.0",
     "tortoise-orm>=0.25.1",
 ]
 prod = [
@@ -25,6 +30,6 @@ prod = [
 ]
 
 [tool.aerich]
-tortoise_orm = "database.TORTOISE_CONFIG"
+tortoise_orm = "app.db.database.TORTOISE_ORM"
 location = "./migrations"
 src_folder = "./."
