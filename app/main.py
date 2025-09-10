@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from app.api.v1 import user_question, diary, notification, quote, bookmark, user, question
@@ -57,3 +58,15 @@ async def root():
 def random_question():
     question = get_random_question()
     return {"question" : question}
+=======
+# app/main.py
+from fastapi import FastAPI
+from app.database import Base, engine
+from app.routes import auth
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI()
+app.include_router(auth.router, prefix="/auth")
+
+>>>>>>> 964351e (user인증 api구현)
