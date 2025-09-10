@@ -13,7 +13,6 @@ app = FastAPI()
 
 # 라우터 등록
 app.include_router(user_question.router, prefix="/api/v1")
-app.include_router(notification.router, prefix="/api/v1")
 app.include_router(user.router, prefix="/api/v1")
 
 # # 기존 라우터 포함 (주석 해제 필요)
@@ -31,12 +30,11 @@ app.include_router(token.router)
 # Tortoise와 FastAPI 연결
 register_tortoise(
     app,
-    db_url="asyncpg://a:0000@localhost:5432/postgres",
+    db_url="asyncpg://postgres:1234@localhost:5432/fastapi_mini_project",
     modules={
         "models": [
             "app.models.user",
             "app.models.user_question",
-            "app.models.notification",
             "app.models.quote",
             "app.models.bookmark",
             "app.models.question",
