@@ -7,8 +7,11 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.116.1",
     "myapplication>=0.1.0",
+    "pyjwt>=2.10.1",
     "python-dotenv>=1.1.1",
+    "sqlalchemy>=2.0.43",
     "tomlkit>=0.13.3",
+    "tortoise-orm[asyncpg]>=0.25.1",
     "uvicorn>=0.35.0",
 ]
 
