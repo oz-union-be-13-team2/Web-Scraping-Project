@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from app.api.v1 import user_question, diary, notification, quote, bookmark, user, question
+
+from app.db.database import TORTOISE_ORM
+from app.api.v1 import diary, token
+from app.api.v1 import user
+
 app = FastAPI()
 
 # 라우터 등록
@@ -17,6 +22,7 @@ app.include_router(question.router, prefix="/api/v1")
 # DB 연결 (예시: SQLite → PostgreSQL/MySQL 가능)
 app.include_router(diary.router)
 app.include_router(user.router)
+app.include_router(token.router)
 
 # Tortoise와 FastAPI 연결
 register_tortoise(

@@ -17,7 +17,6 @@ TORTOISE_ORM = {
     },
 }
 
-
 async def init_db():
     await Tortoise.init(config=TORTOISE_ORM)
     # 자동 테이블 생성 (개발 단계에서만)
