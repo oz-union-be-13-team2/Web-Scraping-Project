@@ -1,57 +1,105 @@
-from fastapi import APIRouter, HTTPException, status
-from typing import List, Optional
-from app.models.notification import Notification
-from app.schemas.notification import NotificationResponse
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from typing import List
 
-router = APIRouter(prefix="/notifications", tags=["notifications"])
+from fastapi import APIRouter, HTTPException, Depends, status
+from pydantic import BaseModel
 
+from app.models.diary import Diary
+from app.models.user import User
+from app.schemas.diary import DiaryUpdateRequest
+from app.services.auth_service import get_current_user
 
-@router.get("/", response_model=List[NotificationResponse])
-async def get_user_notifications(is_read: Optional[bool] = None):
-    # 실제 user_id는 JWT 토큰에서 가져와야 함
-    user_id = 1
+router = APIRouter(prefix="/diaries", tags=["diaries"])
 
-    query = Notification.filter(user_id=user_id)
+class DiaryRequest(BaseModel):
+    title : str
+    content : str
 
-    if is_read is not None:
-        query = query.filter(is_read=is_read)
+class DiaryResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    created_at: datetime
 
-    notifications = await query.order_by("-noti_time")
+@router.post("/", response_model=DiaryResponse)
+async def create_diary(request: DiaryRequest, current_user: User = Depends(get_current_user)):
+    diary = await Diary.create(
+        user_id = current_user,
+        title=request.title,
+        content=request.content,
+    )
+    return DiaryResponse(
+        id = diary.diary_id,
+        title = diary.title,
+        content = diary.content,
+        created_at = diary.created_at.astimezone(ZoneInfo("Asia/Seoul")),
+    )
 
-    # 알림이 없을 경우 빈 리스트 반환
-    if not notifications:
-        # 혹은 404 에러를 발생시켜 클라이언트에게 알릴 수 있음
-        # raise HTTPException(status_code=404, detail="알림을 찾을 수 없습니다.")
-        return []
+@router.get("/my", response_model=List[DiaryResponse])
+async def list_my_diaries(current_user: User = Depends(get_current_user)):
+    diaries = await Diary.filter(user_id=current_user.id)
+    if not diaries:
+        raise HTTPException(status_code=404, detail="Diary not found")
+    return [
+        DiaryResponse(
+            id = d.diary_id,
+            title= d.title,
+            content= d.content,
+            created_at = d.created_at.astimezone(ZoneInfo("Asia/Seoul")),
+        )
+        for d in diaries
+    ]
 
-    return notifications
+@router.get("/", response_model=List[DiaryResponse])
+async def all_list_diaries():
+    diaries = await Diary.all()
+    if not diaries:
+        raise HTTPException(status_code=404, detail="Diary not found")
+    return [
+        DiaryResponse(
+            id = di.diary_id,
+            title= di.title,
+            content= di.content,
+            created_at = di.created_at.astimezone(ZoneInfo("Asia/Seoul")),
+        )
+        for di in diaries
+    ]
 
-@router.put("/{notification_id}/read", response_model=NotificationResponse)
-async def update_notification_read_status(notification_id: int):
-    """특정 알림을 읽음 처리합니다."""
-    notification = await Notification.filter(
-        notification_id=notification_id,
-        user_id=USER_ID
-    ).first()
+@router.delete("/{diary_id}", status_code=204)
+async def delete_diary(
+        diary_id : int,
+        current_user: User = Depends(get_current_user)
+):
+    diary = await Diary.get_or_none(diary_id=diary_id)
+    if not diary:
+        raise HTTPException(status_code=404, detail="Diary not found")
 
-    if not notification:
-        raise HTTPException(status_code=404, detail="알림을 찾을 수 없습니다.")
+    if diary.user_id.id != current_user.id:
+        raise HTTPException(
+            status_code = status.HTTP_403_FORBIDDEN,
+            detail = "Not authorized to delete this diary"
+        )
+    await diary.delete()
+    return None
 
-    notification.is_read = True
-    await notification.save()
+@router.put("/{diary_id}", response_model=DiaryResponse)
+async def update_diary(
+        diary_id : int,
+        request: DiaryUpdateRequest,
+        current_user: User = Depends(get_current_user)
+):
+    diary = await Diary.get_or_none(diary_id = diary_id)
+    if not diary:
+        raise HTTPException(status_code=404, detail="Diary not found")
 
-    return notification
+    diary.title = request.title
+    diary.content = request.content
+    await diary.save()
 
-@router.delete("/{notification_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_notification(notification_id: int):
-    """특정 알림을 삭제합니다."""
-    notification = await Notification.filter(
-        notification_id=notification_id,
-        user_id=USER_ID
-    ).first()
-
-    if not notification:
-        raise HTTPException(status_code=404, detail="알림을 찾을 수 없습니다.")
-
-    await notification.delete()
-    return {"message": "알림이 성공적으로 삭제되었습니다."}
+    return DiaryResponse(
+        id = diary.diary_id,
+        title = diary.title,
+        content = diary.content,
+        created_at = diary.created_at.astimezone(ZoneInfo("Asia/Seoul")),
+    )
