@@ -15,7 +15,8 @@ class UserResponse(BaseModel):
 
 
 @router.post("/", response_model= UserResponse)
-async def create_user
+async def create_user(response: UserResponse):
+
 
 
 
