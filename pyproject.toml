@@ -5,13 +5,16 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "beautifulsoup4>=4.13.5",
     "fastapi>=0.116.1",
     "jose>=1.0.0",
     "jwt>=1.4.0",
     "myapplication>=0.1.0",
     "passlib[bcrypt]>=1.7.4",
+    "playwright>=1.55.0",
     "python-dotenv>=1.1.1",
     "python-jose[cryptography]>=3.5.0",
+    "requests>=2.32.5",
     "tomlkit>=0.13.3",
     "tortoise-orm[asyncpg]>=0.25.1",
     "uvicorn>=0.35.0",
