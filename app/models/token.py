@@ -1,3 +1,4 @@
+
 from tortoise import fields, models
 
 class Token(models.Model):
