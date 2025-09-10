@@ -11,7 +11,7 @@ TORTOISE_CONFIG = {
     "apps": {
         "models": {
             # 모델 파일 경로를 명시합니다. 예: "app.models"
-            "models": ["aerich.models"],
+            "models": ["app,modles","aerich.models"],
             "default_connection": "default",
         }
     },
