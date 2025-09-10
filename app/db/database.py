@@ -11,7 +11,7 @@ TORTOISE_ORM = {
     "connections": {"default": DATABASE_URL},
     "apps": {
         "models": {
-            "models": ["app.models.user", "app.models.diary","aerich.models"],  # 모델 등록
+            "models": ["app.models.user", "app.models.diary", "app.models.quote","aerich.models"],  # 모델 등록
             "default_connection": "default",
         },
     },
