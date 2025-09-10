@@ -12,3 +12,9 @@ class Bookmark(models.Model):
         related_name="bookmarks",
         on_delete=fields.CASCADE,
     )
+
+    class Meta:
+        table = "bookmarks"
+
+    def __str__(self):
+        return f"Bookmark(user={self.user_id}, quote={self.quote_id})"
