@@ -9,6 +9,8 @@ from app.api.v1 import user
 from app.api.v1 import quote
 from app.scraping.quote_scraper import scrape_and_save_quotes
 
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI()
 
 # 라우터 등록
@@ -46,15 +48,3 @@ register_tortoise(
     add_exception_handlers=True,
 )
 
-
-@app.on_event("startup")
-async def startup_event():
-    await scrape_and_save_quotes()
-@app.get("/")
-async def root():
-    return {"message": "Hello, FastAPI + TortoiseORM!"}
-
-@app.get("/random_question")
-def random_question():
-    question = get_random_question()
-    return {"question" : question}
